@@ -184,7 +184,10 @@ impl ObjectType {
                     },
                     false => Some(12),
                 },
-                Arch::Riscv64 => Some(12),
+                Arch::Riscv64 => match config.hypervisor {
+                    true => Some(14),
+                    false => Some(12),
+                }
             },
             ObjectType::PageTable => Some(12),
             ObjectType::HugePage => Some(30),
@@ -192,7 +195,7 @@ impl ObjectType {
             ObjectType::SmallPage => Some(12),
             ObjectType::Vcpu => match config.arch {
                 Arch::Aarch64 => Some(12),
-                _ => panic!("Unexpected architecture asking for vCPU size bits"),
+                Arch::Riscv64 => Some(10),
             },
             _ => None,
         }
