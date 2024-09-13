@@ -237,6 +237,7 @@ SUPPORTED_BOARDS = (
             "KernelRiscvExtD": True,
             "KernelRiscvExtF": True,
             "KernelRiscVHypervisorSupport": True,
+            "KernelRiscVNumVTimers": 1,
         },
         examples={
             "hello": Path("example/qemu_virt_riscv64/hello"),
