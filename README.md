@@ -55,25 +55,34 @@ To build the documentation you also need
 * texlive-fonts-extra
 * texlive-latex-extra
 
+### Linux
+
 On a Debian-like system you can do:
 
-    $ curl https://sh.rustup.rs -sSf | sh
-    $ rustup target add x86_64-unknown-linux-musl
-    $ sudo apt install build-essential git cmake ninja-build \
+```sh
+$ curl https://sh.rustup.rs -sSf | sh
+$ rustup target add x86_64-unknown-linux-musl
+$ sudo apt install build-essential git cmake ninja-build \
         device-tree-compiler libxml2-utils \
         pandoc texlive-latex-base texlive-latex-recommended \
         texlive-fonts-recommended texlive-fonts-extra \
         python3.9 python3.9-venv \
         qemu-system-arm qemu-system-misc \
         gcc-riscv64-unknown-elf
+```
+
 
 If you do not have Python 3.9 available, you can get it via the
 *deadsnakes* PPA: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
 To use this:
 
-    $ sudo add-apt-repository ppa:deadsnakes/ppa
-    $ sudo apt update
-    $ sudo apt install python3.9 python3.9-venv
+```sh
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt update
+$ sudo apt install python3.9 python3.9-venv
+```
+
+### macOS
 
 On macOS, with the [Homebrew](https://brew.sh) package manager you can do:
 
