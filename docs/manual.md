@@ -923,6 +923,14 @@ You can see that when using the `go` command, U-Boot is
 To avoid this behaviour, the call to `armv8_switch_to_el1` should be replaced with
 `armv8_switch_to_el2` in this `do_go_exec` function.
 
+## Ariane (CVA6)
+
+Initial support is available for the CVA6 (formerly Ariane) core design on the Digilent Genesys2 board. CVA6 is an open-source RISC-V (rv64i) processor. Microkit support expects that a compatible RISC-V SBI (OpenSBI) has executed before jumping to the beginning of the loader image.
+
+Note that the loader link address is 0x90000000 and this is where the binary must be located and where OpenSBI (or u-boot) should begin execution. You may compile OpenSBI with the Microkit image as a payload, or alternately install OpenSBI (+u-boot optionally) to the SD card.
+
+Some versions of OpenSBI (including the one distributred as part of the CVA6 SDK!) do NOT correctly load the Microkit. Ensure that you use the same version as seL4test.
+
 ## Adding Platform Support
 
 The following section is a guide for adding support for a new platform to Microkit.
