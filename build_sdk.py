@@ -268,6 +268,8 @@ SUPPORTED_BOARDS = (
             "KernelPlatform": "ariane",
             "KernelRiscvExtD": True,
             "KernelRiscvExtF": True,
+            "KernelRiscVHypervisorSupport": True,
+            "KernelRiscVNumVTimers": 1,
         },
         examples={
             "hello": Path("example/ariane/hello")
