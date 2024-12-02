@@ -292,6 +292,8 @@ SUPPORTED_BOARDS = (
             "KernelPlatform": "cheshire",
             "KernelRiscvExtD": True,
             "KernelRiscvExtF": True,
+            "KernelRiscVHypervisorSupport": True,
+            "KernelRiscVNumVTimers": 1
         },
         examples={
             "hello": Path("example/cheshire/hello")
@@ -404,9 +406,11 @@ def build_sel4(
     sel4_install_dir.mkdir(exist_ok=True, parents=True)
     sel4_build_dir.mkdir(exist_ok=True, parents=True)
 
-    print(f"Building sel4: {sel4_dir=} {root_dir=} {build_dir=} {board=} {config=}")
+    print(
+        f"Building sel4: {sel4_dir=} {root_dir=} {build_dir=} {board=} {config=}")
 
-    config_args = list(board.kernel_options.items()) + list(config.kernel_options.items())
+    config_args = list(board.kernel_options.items()) + \
+        list(config.kernel_options.items())
     config_strs = []
     for arg, val in sorted(config_args):
         if isinstance(val, bool):
@@ -449,7 +453,8 @@ def build_sel4(
     dest.chmod(0o744)
 
     invocations_all = sel4_build_dir / "generated" / "invocations_all.json"
-    dest = (root_dir / "board" / board.name / config.name / "invocations_all.json")
+    dest = (root_dir / "board" / board.name /
+            config.name / "invocations_all.json")
     dest.unlink(missing_ok=True)
     copy(invocations_all, dest)
     dest.chmod(0o744)
@@ -504,7 +509,8 @@ def build_elf_component(
         )
     elf = build_dir / f"{component_name}.elf"
     dest = (
-        root_dir / "board" / board.name / config.name / "elf" / f"{component_name}.elf"
+        root_dir / "board" / board.name /
+        config.name / "elf" / f"{component_name}.elf"
     )
     dest.unlink(missing_ok=True)
     copy(elf, dest)
@@ -579,17 +585,25 @@ def build_lib_component(
 def main() -> None:
     parser = ArgumentParser()
     parser.add_argument("--sel4", type=Path, required=True)
-    parser.add_argument("--tool-target-triple", default=get_tool_target_triple(), help="Compile the Microkit tool for this target triple")
-    parser.add_argument("--boards", metavar="BOARDS", help="Comma-separated list of boards to support. When absent, all boards are supported.")
-    parser.add_argument("--configs", metavar="CONFIGS", help="Comma-separated list of configurations to support. When absent, all configurations are supported.")
-    parser.add_argument("--skip-tool", action="store_true", help="Tool will not be built")
-    parser.add_argument("--skip-sel4", action="store_true", help="seL4 will not be built")
-    parser.add_argument("--skip-docs", action="store_true", help="Docs will not be built")
-    parser.add_argument("--skip-tar", action="store_true", help="SDK and source tarballs will not be built")
+    parser.add_argument("--tool-target-triple", default=get_tool_target_triple(),
+                        help="Compile the Microkit tool for this target triple")
+    parser.add_argument("--boards", metavar="BOARDS",
+                        help="Comma-separated list of boards to support. When absent, all boards are supported.")
+    parser.add_argument("--configs", metavar="CONFIGS",
+                        help="Comma-separated list of configurations to support. When absent, all configurations are supported.")
+    parser.add_argument("--skip-tool", action="store_true",
+                        help="Tool will not be built")
+    parser.add_argument("--skip-sel4", action="store_true",
+                        help="seL4 will not be built")
+    parser.add_argument("--skip-docs", action="store_true",
+                        help="Docs will not be built")
+    parser.add_argument("--skip-tar", action="store_true",
+                        help="SDK and source tarballs will not be built")
     parser.add_argument("--version", default=VERSION, help="SDK version")
     for arch in KernelArch:
         arch_str = arch.name.lower()
-        parser.add_argument(f"--toolchain-prefix-{arch_str}", default=arch.c_toolchain(), help=f"C toolchain prefix when compiling for {arch_str}, e.g {arch_str}-none-elf")
+        parser.add_argument(f"--toolchain-prefix-{arch_str}", default=arch.c_toolchain(
+        ), help=f"C toolchain prefix when compiling for {arch_str}, e.g {arch_str}-none-elf")
 
     args = parser.parse_args()
 
@@ -601,22 +615,28 @@ def main() -> None:
     version = args.version
 
     if args.boards is not None:
-        supported_board_names = frozenset(board.name for board in SUPPORTED_BOARDS)
+        supported_board_names = frozenset(
+            board.name for board in SUPPORTED_BOARDS)
         selected_board_names = frozenset(args.boards.split(","))
         for board_name in selected_board_names:
             if board_name not in supported_board_names:
-                raise Exception(f"Trying to build a board: {board_name} that does not exist in supported list.")
-        selected_boards = [board for board in SUPPORTED_BOARDS if board.name in selected_board_names]
+                raise Exception(
+                    f"Trying to build a board: {board_name} that does not exist in supported list.")
+        selected_boards = [
+            board for board in SUPPORTED_BOARDS if board.name in selected_board_names]
     else:
         selected_boards = SUPPORTED_BOARDS
 
     if args.configs is not None:
-        supported_config_names = frozenset(config.name for config in SUPPORTED_CONFIGS)
+        supported_config_names = frozenset(
+            config.name for config in SUPPORTED_CONFIGS)
         selected_config_names = frozenset(args.configs.split(","))
         for config_name in selected_config_names:
             if config_name not in supported_config_names:
-                raise Exception(f"Trying to build a configuration: {config_name} that does not exist in supported list.")
-        selected_configs = [config for config in SUPPORTED_CONFIGS if config.name in selected_config_names]
+                raise Exception(
+                    f"Trying to build a configuration: {config_name} that does not exist in supported list.")
+        selected_configs = [
+            config for config in SUPPORTED_CONFIGS if config.name in selected_config_names]
     else:
         selected_configs = SUPPORTED_CONFIGS
 
@@ -676,7 +696,8 @@ def main() -> None:
     for board in selected_boards:
         for config in selected_configs:
             if not args.skip_sel4:
-                sel4_gen_config = build_sel4(sel4_dir, root_dir, build_dir, board, config)
+                sel4_gen_config = build_sel4(
+                    sel4_dir, root_dir, build_dir, board, config)
             loader_printing = 1 if config.name == "debug" else 0
             loader_defines = [
                 ("LINK_ADDRESS", hex(board.loader_link_address)),
@@ -685,19 +706,25 @@ def main() -> None:
             # There are some architecture dependent configuration options that the loader
             # needs to know about, so we figure that out here
             if board.arch.is_riscv():
-                loader_defines.append(("FIRST_HART_ID", sel4_gen_config["FIRST_HART_ID"]))
+                loader_defines.append(
+                    ("FIRST_HART_ID", sel4_gen_config["FIRST_HART_ID"]))
             if board.arch.is_arm():
                 if sel4_gen_config["ARM_PA_SIZE_BITS_40"]:
                     arm_pa_size_bits = 40
                 elif sel4_gen_config["ARM_PA_SIZE_BITS_44"]:
                     arm_pa_size_bits = 44
                 else:
-                    raise Exception("Unexpected ARM physical address bits defines")
-                loader_defines.append(("PHYSICAL_ADDRESS_BITS", arm_pa_size_bits))
+                    raise Exception(
+                        "Unexpected ARM physical address bits defines")
+                loader_defines.append(
+                    ("PHYSICAL_ADDRESS_BITS", arm_pa_size_bits))
 
-            build_elf_component("loader", root_dir, build_dir, board, config, loader_defines)
-            build_elf_component("monitor", root_dir, build_dir, board, config, [])
-            build_lib_component("libmicrokit", root_dir, build_dir, board, config)
+            build_elf_component("loader", root_dir, build_dir,
+                                board, config, loader_defines)
+            build_elf_component("monitor", root_dir,
+                                build_dir, board, config, [])
+            build_lib_component("libmicrokit", root_dir,
+                                build_dir, board, config)
         # Setup the examples
         for example, example_path in board.examples.items():
             include_dir = root_dir / "board" / board.name / "example" / example
@@ -724,7 +751,8 @@ def main() -> None:
         source_prefix = Path(f"{NAME}-source-{version}")
         with tar_open(source_tar_file, "w:gz") as tar:
             for filename in filenames:
-                tar.add(filename, arcname=source_prefix / filename, filter=tar_filter)
+                tar.add(filename, arcname=source_prefix /
+                        filename, filter=tar_filter)
 
 
 if __name__ == "__main__":
